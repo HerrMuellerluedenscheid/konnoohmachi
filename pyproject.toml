@@ -1,0 +1,31 @@
+[project]
+name = "konnoohmachi"
+version = "0.0.1"
+description = "Spectral smoothing in rust/python"
+authors = [
+    "Marius Kriegerowski <marius.kriegerowski@gmail.com>"
+]
+license = "MIT"
+readme = "README.md"
+python = "^3.7"
+repository = "https://github.com/HerrMuellerluedenscheid/konnoohmachi"
+
+keywords = ["seismology", "spectral smoothing"]
+
+classifiers = [
+    "Topic :: Software Development"
+]
+
+[dev-dependencies]
+black = { version = "^18.3-alpha.0", python = "^3.7" }
+
+[project.optional-dependencies]
+tests = [
+    'numpy ~= 1.20.0',
+    'pytest < 6',
+    'obspy',
+]
+
+[build-system]
+requires = ["maturin>=0.10,<0.11"]
+build-backend = "maturin"
