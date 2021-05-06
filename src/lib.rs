@@ -29,7 +29,7 @@ fn smoothing_window(freqs: Vec<f64>, f_corner: f64, b: f64) -> Vec <f64> {
     }
 }
 
-pub fn konnoohmachi (freqs: Vec<f64>, amps: Vec<f64>, b: f64) -> Vec<f64> {
+pub fn konnoohmachi_smooth (freqs: Vec<f64>, amps: Vec<f64>, b: f64) -> Vec<f64> {
 
     let n_freqs = freqs.len();
     let mut smoothed = vec![0.; n_freqs];
@@ -53,14 +53,14 @@ fn __version__() -> PyResult<String> {
 }
 
 #[pyfunction]
-fn sum_as_string(freqs: Vec<f64>, amps: Vec<f64>, b: f64) -> PyResult<Vec<f64>> {
-    let smoothed = konnoohmachi(amps.clone(), freqs.clone(), b);
+fn smooth(freqs: Vec<f64>, amps: Vec<f64>, b: f64) -> PyResult<Vec<f64>> {
+    let smoothed = konnoohmachi_smooth(freqs.clone(), amps.clone(), b);
     Ok(smoothed.clone())
 }
 
 #[pymodule]
-fn string_sum(py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_wrapped(wrap_pyfunction!(sum_as_string))?;
+fn konnoohmachi(py: Python, m: &PyModule) -> PyResult<()> {
+    m.add_wrapped(wrap_pyfunction!(smooth))?;
     m.add_wrapped(wrap_pyfunction!(__version__))?;
 
     Ok(())
@@ -76,7 +76,7 @@ mod test {
         let freqs = vec![0.0; 5];
         let b = 0.0;
 
-        assert_eq!(konnoohmachi(freqs, amps.clone(), b), amps);
+        assert_eq!(konnoohmachi_smooth(freqs, amps.clone(), b), amps);
     }
 
     #[test]
@@ -85,7 +85,7 @@ mod test {
         let freqs = vec![0., 1., 2., 3.];
         let b = 1.0;
 
-        assert_eq!(konnoohmachi(freqs, amps.clone(), b), amps);
+        assert_eq!(konnoohmachi_smooth(freqs, amps.clone(), b), amps);
     }
 
     #[test]

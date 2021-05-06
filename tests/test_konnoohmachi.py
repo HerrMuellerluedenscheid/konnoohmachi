@@ -1,30 +1,71 @@
-import string_sum
+import konnoohmachi
 import numpy as np
 import pytest
+import time
+
+_wins = {}
 
 
 def test_konnoohmachi_version():
-    assert isinstance(string_sum.__version__(), str)
+    assert isinstance(konnoohmachi.__version__(), str)
 
 
 def test_konnoohmachi():
-    n_values = 3
     b = 1
-    smoothed = string_sum.sum_as_string(
-        np.arange(n_values), np.ones(n_values), b
+
+    n = 1000
+    freqs = np.arange(n)
+    amps = np.random.rand(n)
+    smoothed = konnoohmachi.smooth(
+        freqs, amps, b
     )
-    print(smoothed)
     print(type(smoothed))
+    print(smoothed)
 
 
-@pytest.mark.skip
-def test_konnoohmachi_against_obspy():
-    import obspy
-    n_values = 3
-    b = 1
-    frequencies = num.arange(n_values)
-    spectra = num.ones(n_values)
-    smoothed = obspy.signal.konnoohmachismoothing.konno_ohmachi_smoothing(
-        spectra, frequencies, bandwidth=b)
+def test_konnoohmachi_benchmark():
+
+    n_values = 1000
+    b = 20
+    frequencies = np.arange(n_values, dtype=float)
+    spectra = np.random.rand(n_values)
+    t1 = time.time()
+    smoothed_pyrocko = konnoohmachi_pyrocko(spectra, frequencies, b)
+    print(time.time() - t1)
+
+    frequencies = np.arange(1, n_values+1, dtype=float)
+    t1 = time.time()
+    smoothed = konnoohmachi.smooth(frequencies, spectra, b)
+    print(time.time() - t1)
 
     print(smoothed)
+
+
+def window(freqs, fc, b):
+    if fc == 0.:
+        w = np.zeros(len(freqs))
+        w[freqs == 0] = 1.
+        return w
+
+    T = np.log10(freqs/fc)*b
+    w = (np.sin(T)/T)**4
+    w[freqs == fc] = 1.
+    w[freqs == 0.] = 0.
+    w /= np.sum(w)
+    return w
+
+
+def konnoohmachi_pyrocko(amps, freqs, b):
+    smooth = np.zeros(len(freqs), dtype=freqs.dtype)
+    amps = np.array(amps)
+    global wins
+    for i, fc in enumerate(freqs):
+        fkey = tuple((b, fc, freqs[0], freqs[1], freqs[-1]))
+        if fkey in _wins.keys():
+            win = _wins[fkey]
+        else:
+            win = window(freqs, fc, b)
+            _wins[fkey] = win
+        smooth[i] = np.sum(win*amps)
+
+    return smooth
