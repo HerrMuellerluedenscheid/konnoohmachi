@@ -1,6 +1,5 @@
 import konnoohmachi
 import numpy as np
-import pytest
 import time
 
 _wins = {}
@@ -16,9 +15,7 @@ def test_konnoohmachi():
     n = 1000
     freqs = np.arange(n)
     amps = np.random.rand(n)
-    smoothed = konnoohmachi.smooth(
-        freqs, amps, b
-    )
+    smoothed = konnoohmachi.smooth(freqs, amps, b)
     print(type(smoothed))
     print(smoothed)
 
@@ -33,24 +30,26 @@ def test_konnoohmachi_benchmark():
     smoothed_pyrocko = konnoohmachi_pyrocko(spectra, frequencies, b)
     print(time.time() - t1)
 
-    frequencies = np.arange(1, n_values+1, dtype=float)
+    frequencies = np.arange(1, n_values + 1, dtype=float)
     t1 = time.time()
     smoothed = konnoohmachi.smooth(frequencies, spectra, b)
+
+    assert smoothed == smoothed_pyrocko
     print(time.time() - t1)
 
     print(smoothed)
 
 
 def window(freqs, fc, b):
-    if fc == 0.:
+    if fc == 0.0:
         w = np.zeros(len(freqs))
-        w[freqs == 0] = 1.
+        w[freqs == 0] = 1.0
         return w
 
-    T = np.log10(freqs/fc)*b
-    w = (np.sin(T)/T)**4
-    w[freqs == fc] = 1.
-    w[freqs == 0.] = 0.
+    T = np.log10(freqs / fc) * b
+    w = (np.sin(T) / T) ** 4
+    w[freqs == fc] = 1.0
+    w[freqs == 0.0] = 0.0
     w /= np.sum(w)
     return w
 
@@ -66,6 +65,6 @@ def konnoohmachi_pyrocko(amps, freqs, b):
         else:
             win = window(freqs, fc, b)
             _wins[fkey] = win
-        smooth[i] = np.sum(win*amps)
+        smooth[i] = np.sum(win * amps)
 
     return smooth
