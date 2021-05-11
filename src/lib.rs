@@ -7,7 +7,7 @@ use pyo3::wrap_pyfunction;
 // A memory-inefficient base line implementation for konnoohmachi spectral filter with a python
 // interface.
 
-fn smoothing_window(freqs: Vec<f64>, f_corner: f64, b: f64) -> Vec <f64> {
+fn smoothing_window(freqs: &Vec<f64>, f_corner: f64, b: f64) -> Vec <f64> {
 
     // Note that there HAS to be a zero frequency at the moment!
     let index_zero_freq = freqs.iter().position(|&f| f == 0.0).unwrap();
@@ -34,8 +34,9 @@ pub fn konnoohmachi_smooth (freqs: Vec<f64>, amps: Vec<f64>, b: f64) -> Vec<f64>
     let n_freqs = freqs.len();
     let mut smoothed = vec![0.; n_freqs];
 
-    for (i_freq, f_corner) in freqs.iter().enumerate() {
-        let window = smoothing_window(freqs.clone(), *f_corner, b);
+    let freqs_iter = freqs.clone();
+    for (i_freq, f_corner) in freqs_iter.iter().enumerate() {
+        let window = smoothing_window(&freqs, *f_corner, b);
 
         let product:f64 = window.iter()
             .zip(amps.iter())
@@ -60,7 +61,7 @@ fn smooth(freqs: Vec<f64>, amps: Vec<f64>, b: f64) -> PyResult<Vec<f64>> {
 
 #[pyfunction]
 fn window(freqs: Vec<f64>, f_corner: f64, b: f64) -> PyResult<Vec<f64>> {
-    let smoothed = smoothing_window(freqs, f_corner, b);
+    let smoothed = smoothing_window(&freqs, f_corner, b);
     Ok(smoothed)
 }
 
@@ -102,7 +103,7 @@ mod test {
         let f_corner = 0.0;
         let b = 0.0;
 
-        assert_eq!(smoothing_window(freqs, f_corner, b), out_expect);
+        assert_eq!(smoothing_window(&freqs, f_corner, b), out_expect);
     }
 
     // #[test]
