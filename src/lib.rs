@@ -50,7 +50,7 @@ pub fn konnoohmachi_smooth (freqs: Vec<f64>, amps: Vec<f64>, b: f64) -> Vec<f64>
 
 #[pyfunction]
 fn __version__() -> PyResult<String> {
-    Ok("0.0.1".to_string())
+    Ok("0.1.1".to_string())
 }
 
 #[pyfunction]

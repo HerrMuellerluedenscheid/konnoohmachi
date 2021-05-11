@@ -1,6 +1,6 @@
 [package]
 name = "konnoohmachi"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Marius Kriegerowski <marius.kriegerowski@gmail.com>"]
 edition = "2018"
 
@@ -15,10 +15,6 @@ name = "konnoohmachi"
 # crate-type = ["cdylib", "rlib"]
 crate-type = ["cdylib"]
 
-[dependencies]
-log = "0.4"
-
 [dependencies.pyo3]
 version = "0.13.2"
 features = ["extension-module"]
-
