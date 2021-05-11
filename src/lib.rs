@@ -20,7 +20,7 @@ fn smoothing_window(freqs: Vec<f64>, f_corner: f64, b: f64) -> Vec <f64> {
     } else {
         let mut freqs = freqs.iter()
             .map(|freq| f64::log10(freq / f_corner) * b)
-            .map(|w| (f64::sin(w) / w))
+            .map(|w| f64::powi(f64::sin(w) / w, 4))
             .collect::<Vec<f64>>();
         freqs[index_f_corner] = 1.;
         freqs[index_zero_freq] = 0.;
@@ -58,9 +58,16 @@ fn smooth(freqs: Vec<f64>, amps: Vec<f64>, b: f64) -> PyResult<Vec<f64>> {
     Ok(smoothed.clone())
 }
 
+#[pyfunction]
+fn window(freqs: Vec<f64>, f_corner: f64, b: f64) -> PyResult<Vec<f64>> {
+    let smoothed = smoothing_window(freqs.clone(), f_corner, b);
+    Ok(smoothed.clone())
+}
+
 #[pymodule]
 fn konnoohmachi(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(smooth))?;
+    m.add_wrapped(wrap_pyfunction!(window))?;
     m.add_wrapped(wrap_pyfunction!(__version__))?;
 
     Ok(())
