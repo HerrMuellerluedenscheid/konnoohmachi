@@ -1,5 +1,4 @@
 #![allow(non_snake_case)]
-#![allow(unused_variables)]
 
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
@@ -25,7 +24,8 @@ fn smoothing_window(freqs: &Vec<f64>, f_corner: f64, b: f64) -> Vec <f64> {
         freqs[index_f_corner] = 1.;
         freqs[index_zero_freq] = 0.;
         let normalization: f64 = freqs.iter().sum();
-        freqs.iter().map(| &x | &x / normalization).collect()
+        freqs.iter_mut().for_each(|x| *x /= normalization);
+        freqs
     }
 }
 
@@ -66,7 +66,7 @@ fn window(freqs: Vec<f64>, f_corner: f64, b: f64) -> PyResult<Vec<f64>> {
 }
 
 #[pymodule]
-fn konnoohmachi(py: Python, m: &PyModule) -> PyResult<()> {
+fn konnoohmachi(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(smooth))?;
     m.add_wrapped(wrap_pyfunction!(window))?;
     m.add_wrapped(wrap_pyfunction!(__version__))?;
