@@ -1,5 +1,8 @@
 #![allow(non_snake_case)]
+#![allow(unused_imports)]
 
+use ndarray::{ArrayD, ArrayViewD, ArrayViewMutD};
+use numpy::{c64, IntoPyArray, PyArrayDyn, PyReadonlyArrayDyn};
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
 
@@ -48,28 +51,24 @@ pub fn konnoohmachi_smooth (freqs: Vec<f64>, amps: Vec<f64>, b: f64) -> Vec<f64>
     smoothed
 }
 
-#[pyfunction]
-fn __version__() -> PyResult<String> {
-    Ok("0.1.1".to_string())
-}
-
-#[pyfunction]
-fn smooth(freqs: Vec<f64>, amps: Vec<f64>, b: f64) -> PyResult<Vec<f64>> {
-    let smoothed = konnoohmachi_smooth(freqs, amps, b);
-    Ok(smoothed)
-}
-
-#[pyfunction]
-fn window(freqs: Vec<f64>, f_corner: f64, b: f64) -> PyResult<Vec<f64>> {
-    let smoothed = smoothing_window(&freqs, f_corner, b);
-    Ok(smoothed)
-}
-
 #[pymodule]
 fn konnoohmachi(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_wrapped(wrap_pyfunction!(smooth))?;
-    m.add_wrapped(wrap_pyfunction!(window))?;
-    m.add_wrapped(wrap_pyfunction!(__version__))?;
+    #[pyfn(m, "smooth")]
+    fn smooth_py(freqs: Vec<f64>, amps: Vec<f64>, b: f64) -> PyResult<Vec<f64>> {
+        let smoothed = konnoohmachi_smooth(freqs, amps, b);
+        Ok(smoothed)
+    }
+
+    #[pyfn(m, "window")]
+    fn window_py(freqs: Vec<f64>, f_corner: f64, b: f64) -> PyResult<Vec<f64>> {
+        let window = smoothing_window(&freqs, f_corner, b);
+        Ok(window)
+    }
+
+    #[pyfn(m, "__version__")]
+    fn version_py() -> PyResult<String> {
+        Ok("0.1.1".to_string())
+    }
 
     Ok(())
 }
