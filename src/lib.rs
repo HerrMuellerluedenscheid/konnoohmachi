@@ -54,14 +54,14 @@ fn __version__() -> PyResult<String> {
 
 #[pyfunction]
 fn smooth(freqs: Vec<f64>, amps: Vec<f64>, b: f64) -> PyResult<Vec<f64>> {
-    let smoothed = konnoohmachi_smooth(freqs.clone(), amps.clone(), b);
-    Ok(smoothed.clone())
+    let smoothed = konnoohmachi_smooth(freqs, amps, b);
+    Ok(smoothed)
 }
 
 #[pyfunction]
 fn window(freqs: Vec<f64>, f_corner: f64, b: f64) -> PyResult<Vec<f64>> {
-    let smoothed = smoothing_window(freqs.clone(), f_corner, b);
-    Ok(smoothed.clone())
+    let smoothed = smoothing_window(freqs, f_corner, b);
+    Ok(smoothed)
 }
 
 #[pymodule]
