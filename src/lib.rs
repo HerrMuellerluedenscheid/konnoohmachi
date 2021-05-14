@@ -7,7 +7,7 @@ use pyo3::wrap_pyfunction;
 // A memory-inefficient base line implementation for konnoohmachi spectral filter with a python
 // interface.
 
-fn smoothing_window(freqs: &Vec<f64>, f_corner: f64, b: f64) -> Vec<f64> {
+fn smoothing_window(freqs: &[f64], f_corner: f64, b: f64) -> Vec<f64> {
     // Note that there HAS to be a zero frequency at the moment!
     let error_margin = 0.000000001;
 
