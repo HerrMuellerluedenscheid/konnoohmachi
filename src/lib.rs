@@ -9,8 +9,10 @@ use pyo3::wrap_pyfunction;
 
 fn smoothing_window(freqs: &Vec<f64>, f_corner: f64, b: f64) -> Vec<f64> {
     // Note that there HAS to be a zero frequency at the moment!
+    let error_margin = 0.000000001;
+
     let index_zero_freq = freqs.iter().position(|&f| f == 0.0).unwrap();
-    let index_f_corner = freqs.iter().position(|&f| f == f_corner).unwrap();
+    let index_f_corner = freqs.iter().position(|&f| (f - f_corner).abs() < error_margin).unwrap();
 
     if f_corner == 0.0 {
         let mut window = vec![0.; freqs.len()];
