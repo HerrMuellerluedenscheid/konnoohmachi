@@ -1,6 +1,6 @@
 [project]
 name = "konnoohmachi"
-version = "0.1.1"
+version = "0.1.4"
 description = "Spectral smoothing in rust/python"
 authors = [
     "Marius Kriegerowski <marius.kriegerowski@gmail.com>"

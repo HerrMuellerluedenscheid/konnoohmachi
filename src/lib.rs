@@ -4,7 +4,7 @@
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
 
-// A memory-inefficient base line implementation for konnoohmachi spectral filter with a python
+// A base line implementation for konnoohmachi spectral filter with a python
 // interface.
 
 fn smoothing_window(freqs: &[f64], f_corner: f64, b: f64) -> Vec<f64> {
@@ -63,7 +63,7 @@ fn konnoohmachi(_py: Python, m: &PyModule) -> PyResult<()> {
 
     #[pyfn(m, "__version__")]
     fn version_py() -> PyResult<String> {
-        Ok("0.1.1".to_string())
+        Ok("0.1.4".to_string())
     }
 
     Ok(())

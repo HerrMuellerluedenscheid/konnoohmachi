@@ -1,6 +1,6 @@
 [package]
 name = "konnoohmachi"
-version = "0.1.1"
+version = "0.1.4"
 authors = ["Marius Kriegerowski <marius.kriegerowski@gmail.com>"]
 edition = "2018"
 
