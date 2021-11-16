@@ -1,0 +1,26 @@
+name: Python
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: install maturin (to be included in pyproject)
+      run: pip3 install maturin pytest numpy
+    - name: install
+      run: pip3 install .
+    - name: Build
+      run: maturin build
+    - name: test
+      run: pytest tests
