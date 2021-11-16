@@ -88,7 +88,7 @@ mod test {
         let freqs = vec![0., 1., 2., 3.];
         let b = 1.0;
 
-        assert_eq!(konnoohmachi_smooth(freqs, amps.clone(), b), amps);
+        assert_eq!(konnoohmachi_smooth(freqs, amps.clone(), b), [3.0, 2.5921214954009724, 2.6908685219248403, 2.7475508921225154]);
     }
 
     #[test]
