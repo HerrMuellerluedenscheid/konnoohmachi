@@ -17,7 +17,7 @@ def test_konnoohmachi():
     freqs = np.arange(n)
     amps = np.random.rand(n)
     smoothed = konnoohmachi.smooth(freqs, amps, b)
-    print(type(smoothed))
+    assert isinstance(smoothed, np.ndarray)
 
 
 def test_window():
@@ -33,7 +33,7 @@ def test_window():
 
 
 def test_konnoohmachi_benchmark():
-    n_values = 20000
+    n_values = 200
     b = 20
     frequencies = np.arange(n_values, dtype=float)
     spectra = np.random.rand(n_values)
