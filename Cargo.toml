@@ -1,32 +1,17 @@
 [package]
 name = "konnoohmachi"
-version = "0.1.4"
+version = "0.2.0"
 authors = ["Marius Kriegerowski <marius.kriegerowski@gmail.com>"]
 license = "MIT"
-edition = "2018"
+edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
-name = "konnoohmachi"
+crate-type = ["cdylib"]
 
-# "cdylib" is necessary to produce a shared library for Python to import from.
-#
-# Downstream Rust code (including code in `bin/`, `examples/`, and `tests/`) will not be able
-# to `use string_sum;` unless the "rlib" or "lib" crate type is also included, e.g.:
-# crate-type = ["cdylib", "rlib"]
-crate-type = ["cdylib", "rlib"]
+[dependencies]
+ndarray = {version="0.15.4"}
+numpy = "0.15"
 
 [dependencies.pyo3]
-version = "0.15.0"
+version = "0.15.1"
 features = ["extension-module"]
-
-[dev-dependencies]
-criterion = "0.3"
-rand = "0.8.0"
-itertools = "0.10.0"
-itertools-num = "0.1.1"
-
-[[bench]]
-name = "my_benchmark"
-harness = false
-path = "src/my_benchmark.rs"
