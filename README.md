@@ -40,6 +40,19 @@ amplitudes = np.random.rand(n)
 smoothed = konnoohmachi.smooth(freqs, amplitudes, b)
 ```
 
+```rust
+use konnoohmachi;
+
+let frequencies = Array1::<f64>::zeros(10);
+let amplitudes = Array1::<f64>::ones(10);
+let bandwidth = 40.0;
+konnoohmachi_smooth(
+    frequencies.view().into_dyn(),
+    amplitudes.view().into_dyn(),
+    bandwidth,
+);
+```
+
 ## Benchmarks
 
 Measuring the execution time based of increasing sized spectra yields:
