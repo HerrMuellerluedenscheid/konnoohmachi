@@ -1,115 +1,89 @@
-#![allow(non_snake_case)]
-#![allow(unused_imports)]
+use ndarray::{self, Array, Array1, ArrayBase, Dim, IxDynImpl, OwnedRepr, ViewRepr, Zip};
+use numpy::{IntoPyArray, PyArray1, PyArrayDyn};
+use pyo3::prelude::{pymodule, PyModule, PyResult, Python};
 
-use pyo3::prelude::*;
-use pyo3::wrap_pyfunction;
-
-// A base line implementation for konnoohmachi spectral filter with a python
-// interface.
-
-fn smoothing_window(freqs: &[f64], f_corner: f64, b: f64) -> Vec<f64> {
-    // Note that there HAS to be a zero frequency at the moment!
-    let error_margin = 0.000000001;
-
-    let index_zero_freq = freqs.iter().position(|&f| f == 0.0).unwrap();
-    let index_f_corner = freqs.iter().position(|&f| (f - f_corner).abs() < error_margin).unwrap();
-
-    if f_corner == 0.0 {
-        let mut window = vec![0.; freqs.len()];
-        window[index_zero_freq] = 1.;
-        window
-    } else {
-        let mut freqs = freqs
-            .iter()
-            .map(|freq| f64::log10(freq / f_corner) * b)
-            .map(|w| f64::powi(f64::sin(w) / w, 4))
-            .collect::<Vec<f64>>();
-        freqs[index_f_corner] = 1.;
-        freqs[index_zero_freq] = 0.;
-        let normalization: f64 = freqs.iter().sum();
-        freqs.iter_mut().for_each(|x| *x /= normalization);
-        freqs
-    }
-}
-
-pub fn konnoohmachi_smooth(freqs: Vec<f64>, amps: Vec<f64>, b: f64) -> Vec<f64> {
-    let n_freqs = freqs.len();
-    let mut smoothed = vec![0.; n_freqs];
-
-    let freqs_iter = freqs.clone();
-    for (i_freq, f_corner) in freqs_iter.iter().enumerate() {
-        let window = smoothing_window(&freqs, *f_corner, b);
-
-        let product: f64 = window.iter().zip(amps.iter()).map(|(x, y)| x * y).sum();
-
-        smoothed[i_freq] = product;
-    }
-    smoothed
-}
-
+/// Python module that implements konnoohmachi spectral smoothing
 #[pymodule]
-fn konnoohmachi(_py: Python, m: &PyModule) -> PyResult<()> {
-    #[pyfn(m, "smooth")]
-    fn smooth_py(freqs: Vec<f64>, amps: Vec<f64>, b: f64) -> PyResult<Vec<f64>> {
-        let smoothed = konnoohmachi_smooth(freqs, amps, b);
-        Ok(smoothed)
-    }
+fn konnoohmachi(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+    /// Python interface: Smooth a spectrum provided as two one-dimensional vectors containing
+    /// `frequencies` and `amplitudes`
+    #[pyfn(m)]
+    fn smooth<'py>(
+        py: Python<'py>,
+        frequencies: &PyArrayDyn<f64>,
+        amplitudes: &PyArrayDyn<f64>,
+        bandwidth: f64,
+    ) -> &'py PyArray1<f64> {
+        let frequencies = unsafe { frequencies.as_array() };
+        let amplitudes = unsafe { amplitudes.as_array() };
 
-    #[pyfn(m, "window")]
-    fn window_py(freqs: Vec<f64>, f_corner: f64, b: f64) -> PyResult<Vec<f64>> {
-        let window = smoothing_window(&freqs, f_corner, b);
-        Ok(window)
-    }
-
-    #[pyfn(m, "__version__")]
-    fn version_py() -> PyResult<String> {
-        Ok("0.1.4".to_string())
+        let out = konnoohmachi_smooth(frequencies, amplitudes, bandwidth);
+        out.into_pyarray(py)
     }
 
     Ok(())
 }
 
+/// Smooth a spectrum provided as two one-dimensional vectors containing
+/// `frequencies` and `amplitudes`
+pub fn konnoohmachi_smooth(
+    frequencies: ArrayBase<ViewRepr<&f64>, Dim<IxDynImpl>>,
+    amplitudes: ArrayBase<ViewRepr<&f64>, Dim<IxDynImpl>>,
+    bandwidth: f64,
+) -> ArrayBase<OwnedRepr<f64>, Dim<[usize; 1]>> {
+    assert_eq!(
+        frequencies.len(),
+        amplitudes.len(),
+        "amplitudes and frequencies have to have equal length."
+    );
+
+    assert!(bandwidth > 0.0, "bandwidth has to be greater than 0.");
+
+    let mut out = Array1::<f64>::ones(frequencies.len());
+
+    let zero_frequency_index = frequencies.iter().position(|&v| v == 0.0).unwrap();
+
+    let mut frequencies_work: ArrayBase<OwnedRepr<f64>, _> = Array::zeros(frequencies.raw_dim());
+    frequencies_work.assign(&frequencies);
+
+    for (index_frequency, corner_frequency) in frequencies.iter().enumerate() {
+        Zip::from(&mut frequencies_work)
+            .and(&frequencies)
+            .for_each(|freq_work, &freq| {
+                *freq_work = f64::log10(freq / corner_frequency * bandwidth)
+            });
+
+        frequencies_work.map_inplace(|w| *w = f64::powi(f64::sin(*w) / *w, 4));
+        frequencies_work[index_frequency] = 1.;
+        frequencies_work[zero_frequency_index] = 0.;
+
+        let normalization = frequencies_work.sum();
+
+        Zip::from(&mut frequencies_work)
+            .and(&amplitudes)
+            .for_each(|w, &a| *w = (*w * a) / normalization);
+
+        out[index_frequency] = frequencies_work.sum();
+    }
+    out[zero_frequency_index] = 0.;
+    out
+}
+
 #[cfg(test)]
-mod test {
-    use super::*;
+mod tests {
+    use ndarray::Array1;
+
+    use crate::konnoohmachi_smooth;
 
     #[test]
-    fn test_konnoohmachi_zero() {
-        let amps = vec![0.0; 5];
-        let freqs = vec![0.0; 5];
-        let b = 0.0;
-
-        assert_eq!(konnoohmachi_smooth(freqs, amps.clone(), b), amps);
+    fn test_basic_ndarray() {
+        let frequencies = Array1::<f64>::zeros(10);
+        let amplitudes = Array1::<f64>::ones(10);
+        let bandwidth = 1.0;
+        konnoohmachi_smooth(
+            frequencies.view().into_dyn(),
+            amplitudes.view().into_dyn(),
+            bandwidth,
+        );
     }
-
-    #[test]
-    fn test_konnoohmachi() {
-        let amps = vec![3., 1., 3., 4.];
-        let freqs = vec![0., 1., 2., 3.];
-        let b = 1.0;
-
-        assert_eq!(konnoohmachi_smooth(freqs, amps.clone(), b), [3.0, 2.5921214954009724, 2.6908685219248403, 2.7475508921225154]);
-    }
-
-    #[test]
-    fn test_smoothing_window_zero() {
-        let freqs = vec![0.0, 1.0, f64::log10(2.0)];
-        let out_expect = vec![1., 0., 0.];
-        let f_corner = 0.0;
-        let b = 0.0;
-
-        assert_eq!(smoothing_window(&freqs, f_corner, b), out_expect);
-    }
-
-    // #[test]
-    // fn test_smoothing_window() {
-    //     let freqs = vec![0.0, 1.0, 2.0];
-    //     let mut result = f64::log10(2.0);
-    //     result = f64::powi(result.sin() / result, 4);
-    //     let out_expect = vec![0.0, 1.0, result];
-    //     let f_corner = 1.0;
-    //     let b = 1.0;
-    //
-    //     // assert_eq!(smoothing_window(freqs.clone(), f_corner, b), out_expect);
-    // }
 }
