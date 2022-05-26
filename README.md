@@ -30,6 +30,8 @@ pip install .
 
 This smoothes some random numbers:
 
+### Python
+
 ```python
 import konnoohmachi
 
@@ -39,6 +41,8 @@ freqs = np.arange(n)
 amplitudes = np.random.rand(n)
 smoothed = konnoohmachi.smooth(freqs, amplitudes, b)
 ```
+
+### Rust
 
 ```rust
 use konnoohmachi;
