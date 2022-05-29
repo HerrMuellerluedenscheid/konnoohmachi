@@ -8,12 +8,6 @@ Fast Konno-Ohmachi Spectral Smoothing
 
 Implemented in Rust with a Python interface. The performance gain measured against the widely used Python/numpy implementation that comes with [obspy](https://docs.obspy.org/packages/autogen/obspy.signal.konnoohmachismoothing.konno_ohmachi_smoothing.html#obspy.signal.konnoohmachismoothing.konno_ohmachi_smoothing) approaches approximately a factor of 2.5 for large and 10 for small vectors (see [Benchmarks](#Benchmarks)).
 
-## Dependencies
-
-You need the rust compiler installed:
-
-[Rust](https://www.rust-lang.org/tools/install)
-
 ## Installation
 
 Installation from pypi:
