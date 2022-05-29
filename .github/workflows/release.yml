@@ -53,7 +53,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: pip install --user -U pip wheel twine maturin
-
       - run: maturin build --no-sdist --release --strip -i $pythonLocation"python.exe"
       - run: pip install konnoohmachi --no-index -f target/wheels
       - run: twine upload --non-interactive --skip-existing target\wheels\*
@@ -101,8 +100,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: pip install -U pip wheel twine maturin
-      - run: PATH=$HOME/.cargo/bin:$PATH PYO3_CROSS_LIB_DIR=$(python -c "import sysconfig;print(sysconfig.get_config_var('LIBDIR'))") maturin build --no-sdist --release --strip --cargo-extra-args="--features=unstable-simd" --universal2
+      - run: PATH=$HOME/.cargo/bin:$PATH PYO3_CROSS_LIB_DIR=$(python -c "import sysconfig;print(sysconfig.get_config_var('LIBDIR'))") maturin build --no-sdist --release --strip --universal2
       - run: twine upload --non-interactive --skip-existing target/wheels/*
+
   release_sdist:
     name: Release sdist
     runs-on: ubuntu-latest
