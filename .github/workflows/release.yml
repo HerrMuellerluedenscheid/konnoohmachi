@@ -12,7 +12,7 @@ env:
   RUSTFLAGS: -C target-cpu=k8
 
 jobs:
-  release_manylinux:
+  release_manylinux-86:
     name: Release manylinux
     runs-on: ubuntu-latest
     strategy:
@@ -35,7 +35,29 @@ jobs:
       - run: .venv/bin/pip install konnoohmachi --no-index -f target/wheels
       - run: .venv/bin/pytest
       - run: .venv/bin/twine upload --non-interactive --skip-existing target/wheels/*
+  release_manylinux-arm:
+    name: Release manylinux
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-path: ['cp37-cp37m', 'cp38-cp38', 'cp39-cp39', 'cp310-cp310']
+    container: quay.io/pypa/manylinux2014_armv7l:latest
 
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+      - run: yum install -y libffi libffi-devel openssl openssl-devel
+      - run: /opt/python/${{ matrix.python-path }}/bin/python -m venv .venv
+      - run: .venv/bin/pip install -U pip wheel twine maturin
+      - run: .venv/bin/pip install '.[tests]'
+      - run: .venv/bin/maturin build --no-sdist --release --strip --manylinux 2014 -i /opt/python/${{ matrix.python-path }}/bin/python --target armv7l-unknown-linux-gnu
+      - run: .venv/bin/pip install konnoohmachi --no-index -f target/wheels
+      - run: .venv/bin/pytest
+      - run: .venv/bin/twine upload --non-interactive --skip-existing target/wheels/*
   release_windows:
     name: Release windows
     runs-on: windows-latest
