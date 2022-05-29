@@ -1,5 +1,5 @@
-[![PyPI](https://img.shields.io/pypi/v/konnoohmachi.svg)](https://pypi.python.org/pypi)
-[![PyPI](https://img.shields.io/pypi/dm/konnoohmachi.svg)](https://pypi.python.org/pypi)
+[![PyPI](https://img.shields.io/pypi/v/konnoohmachi.svg)](https://pypi.org/project/konnoohmachi/)
+[![PyPI](https://img.shields.io/pypi/dm/konnoohmachi.svg)](https://pypi.org/project/konnoohmachi/)
 [![Python](https://github.com/HerrMuellerluedenscheid/konnoohmachi/actions/workflows/python.yml/badge.svg)](https://github.com/HerrMuellerluedenscheid/konnoohmachi/actions/workflows/python.yml)
 [![Rust](https://github.com/HerrMuellerluedenscheid/konnoohmachi/actions/workflows/rust.yml/badge.svg)](https://github.com/HerrMuellerluedenscheid/konnoohmachi/actions/workflows/rust.yml)
 
@@ -10,7 +10,7 @@ Implemented in Rust with a Python interface. The performance gain measured again
 
 ## Installation
 
-Installation from pypi:
+Installation from [pypi](https://pypi.org/project/konnoohmachi/):
 
 ```bash
 pip install konnoohmachi
