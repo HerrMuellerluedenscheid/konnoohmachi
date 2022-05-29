@@ -56,10 +56,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: pip install --user -U pip wheel twine maturin
-      - run: pip install '.[tests]'
+
       - run: maturin build --no-sdist --release --strip -i $pythonLocation"python.exe"
       - run: pip install konnoohmachi --no-index -f target/wheels
-      - run: pytest
       - run: twine upload --non-interactive --skip-existing target\wheels\*
 
   release_macos_x64:
