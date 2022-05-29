@@ -35,6 +35,7 @@ jobs:
       - run: .venv/bin/pip install konnoohmachi --no-index -f target/wheels
       - run: .venv/bin/pytest
       - run: .venv/bin/twine upload --non-interactive --skip-existing target/wheels/*
+
   release_windows:
     name: Release windows
     runs-on: windows-latest

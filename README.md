@@ -37,11 +37,13 @@ This smoothes some random numbers:
 ```python
 import konnoohmachi
 
-b = 10
-n = 1000
-freqs = np.arange(n)
-amplitudes = np.random.rand(n)
-smoothed = konnoohmachi.smooth(freqs, amplitudes, b)
+bandwidth = 40
+
+# using fake random data
+frequencies = np.arange(1000)
+amplitudes = np.random.rand(1000)
+
+smoothed_amplitudes = konnoohmachi.smooth(frequencies, amplitudes, bandwidth)
 ```
 
 ### Rust
