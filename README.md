@@ -1,10 +1,12 @@
 [![PyPI](https://img.shields.io/pypi/v/konnoohmachi.svg)](https://pypi.python.org/pypi)
 [![PyPI](https://img.shields.io/pypi/dm/konnoohmachi.svg)](https://pypi.python.org/pypi)
+[![Python](https://github.com/HerrMuellerluedenscheid/konnoohmachi/actions/workflows/python.yml/badge.svg)](https://github.com/HerrMuellerluedenscheid/konnoohmachi/actions/workflows/python.yml)
+[![Rust](https://github.com/HerrMuellerluedenscheid/konnoohmachi/actions/workflows/rust.yml/badge.svg)](https://github.com/HerrMuellerluedenscheid/konnoohmachi/actions/workflows/rust.yml)
 
-Konno-Ohmachi spectral smoothing
-================================
+Fast Konno-Ohmachi Spectral Smoothing
+=====================================
 
-Implemented in Rust with a Python interface. The performance gain measured against the widely used Python/numpy implementation that comes with [obspy](https://docs.obspy.org/packages/autogen/obspy.signal.konnoohmachismoothing.konno_ohmachi_smoothing.html#obspy.signal.konnoohmachismoothing.konno_ohmachi_smoothing) approaches approximately a factor of 2.5 for large spectra (see [Benchmarks](#Benchmarks)).
+Implemented in Rust with a Python interface. The performance gain measured against the widely used Python/numpy implementation that comes with [obspy](https://docs.obspy.org/packages/autogen/obspy.signal.konnoohmachismoothing.konno_ohmachi_smoothing.html#obspy.signal.konnoohmachismoothing.konno_ohmachi_smoothing) approaches approximately a factor of 2.5 for large and 10 for small vectors (see [Benchmarks](#Benchmarks)).
 
 ## Dependencies
 

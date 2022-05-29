@@ -6,6 +6,11 @@ on:
     tags:
       - '*.*.*'
 
+env:
+  TWINE_PASSWORD: ${{secrets.TWINE_PASSWORD}}
+  TWINE_USERNAME: ${{secrets.TWINE_USERNAME}}
+  RUSTFLAGS: -C target-cpu=k8
+
 jobs:
   release_manylinux:
     name: Release manylinux
@@ -14,10 +19,6 @@ jobs:
       matrix:
         python-path: ['cp37-cp37m', 'cp38-cp38', 'cp39-cp39', 'cp310-cp310']
     container: quay.io/pypa/manylinux2014_x86_64:latest
-    env:
-      TWINE_PASSWORD: ${{secrets.TWINE_PASSWORD}}
-      TWINE_USERNAME: ${{secrets.TWINE_USERNAME}}
-      RUSTFLAGS: -C target-cpu=k8
 
     steps:
       - uses: actions/checkout@v2
@@ -40,10 +41,6 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10']
-    env:
-      TWINE_PASSWORD: ${{secrets.TWINE_PASSWORD}}
-      TWINE_USERNAME: ${{secrets.TWINE_USERNAME}}
-      RUSTFLAGS: -C target-cpu=k8
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -56,10 +53,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: pip install --user -U pip wheel twine maturin
-      - run: pip install '.[tests]'
       - run: maturin build --no-sdist --release --strip -i $pythonLocation"python.exe"
       - run: pip install konnoohmachi --no-index -f target/wheels
-      - run: pytest
       - run: twine upload --non-interactive --skip-existing target\wheels\*
 
   release_macos_x64:
@@ -68,10 +63,6 @@ jobs:
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10']
     runs-on: macos-latest
-    env:
-      TWINE_PASSWORD: ${{secrets.TWINE_PASSWORD}}
-      TWINE_USERNAME: ${{secrets.TWINE_USERNAME}}
-      RUSTFLAGS: -C target-cpu=k8
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -96,9 +87,6 @@ jobs:
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10']
     runs-on: macos-latest
-    env:
-      TWINE_PASSWORD: ${{secrets.TWINE_PASSWORD}}
-      TWINE_USERNAME: ${{secrets.TWINE_USERNAME}}
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
@@ -112,26 +100,5 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: pip install -U pip wheel twine maturin
-      - run: PATH=$HOME/.cargo/bin:$PATH PYO3_CROSS_LIB_DIR=$(python -c "import sysconfig;print(sysconfig.get_config_var('LIBDIR'))") maturin build --no-sdist --release --strip --cargo-extra-args="--features=unstable-simd" --universal2
-      - run: twine upload --non-interactive --skip-existing target/wheels/*
-  release_sdist:
-    name: Release sdist
-    runs-on: ubuntu-latest
-    env:
-      TWINE_PASSWORD: ${{secrets.TWINE_PASSWORD}}
-      TWINE_USERNAME: ${{secrets.TWINE_USERNAME}}
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: nightly
-          override: true
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - run: pip install -U pip wheel twine maturin
-      - run: pip install '.[tests]'
-      - run: maturin sdist
+      - run: PATH=$HOME/.cargo/bin:$PATH PYO3_CROSS_LIB_DIR=$(python -c "import sysconfig;print(sysconfig.get_config_var('LIBDIR'))") maturin build --no-sdist --release --strip --universal2
       - run: twine upload --non-interactive --skip-existing target/wheels/*

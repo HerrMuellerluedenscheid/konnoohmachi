@@ -17,8 +17,9 @@ black = { version = "^18.3-alpha.0", python = "^3.7" }
 
 [project.optional-dependencies]
 tests = [
-    'numpy ~= 1.20.0',
+    'numpy ~= 1.21.0',
     'obspy',
+    'pytest',
 ]
 
 [build-system]

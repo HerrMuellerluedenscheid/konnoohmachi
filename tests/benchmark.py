@@ -15,7 +15,7 @@ nrepeat = 2
 bandwidth = 40
 times_python = []
 times_rust = []
-want_plot = False
+want_plot = True
 
 print(f"nsamples | Rust \t| Python \t| Gain")
 print("-" * 60)
@@ -44,10 +44,10 @@ for nsamples_exp in range(8, 16):
     )
 
 if want_plot:
-    plt.figure(figsize=(12, 6))
-    plt.plot(times_python, label="python")
-    plt.plot(times_rust, label="rust")
-    plt.legend()
+    # plt.figure(figsize=(12, 6))
+    # plt.plot(times_python, label="python")
+    # plt.plot(times_rust, label="rust")
+    # plt.legend()
 
     plt.figure(figsize=(12, 6))
     plt.loglog(freqs, np.abs(spec), label="raw", color="grey")
