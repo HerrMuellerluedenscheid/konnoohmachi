@@ -5,6 +5,10 @@ on:
   push:
     tags:
       - '*.*.*'
+  # for testing:
+  pull_request:
+    branches:
+      - main
 
 env:
   TWINE_PASSWORD: ${{secrets.TWINE_PASSWORD}}
