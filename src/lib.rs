@@ -40,8 +40,7 @@ pub fn konnoohmachi_smooth(
     assert!(bandwidth > 0.0, "bandwidth has to be greater than 0.");
 
     let mut out = Array1::<f64>::ones(frequencies.len());
-
-    let zero_frequency_index = frequencies.iter().position(|&v| v == 0.0).unwrap();
+    let zero_frequency_index = frequencies.iter().position(|&v| v == 0.0).unwrap_or(usize::MAX);
 
     let mut frequencies_work: ArrayBase<OwnedRepr<f64>, _> = Array::zeros(frequencies.raw_dim());
     frequencies_work.assign(&frequencies);
@@ -55,7 +54,10 @@ pub fn konnoohmachi_smooth(
 
         frequencies_work.map_inplace(|w| *w = f64::powi(f64::sin(*w) / *w, 4));
         frequencies_work[index_frequency] = 1.;
-        frequencies_work[zero_frequency_index] = 0.;
+
+        if zero_frequency_index != usize::MAX{
+            frequencies_work[zero_frequency_index] = 0.;
+        }
 
         let normalization = frequencies_work.sum();
 
@@ -65,7 +67,6 @@ pub fn konnoohmachi_smooth(
 
         out[index_frequency] = frequencies_work.sum();
     }
-    out[zero_frequency_index] = 0.;
     out
 }
 

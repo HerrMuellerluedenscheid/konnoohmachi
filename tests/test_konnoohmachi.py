@@ -12,13 +12,13 @@ def test_random_data():
     assert smoothed_spectrum.shape == frequencies.shape
 
 
-# def test_no_zero_frequency():
-#     frequencies = np.linspace(1, 10, 10)
-#     amplitudes = np.random.rand(10)
-#     bandwidth = 40
-#     smoothed_spectrum = konnoohmachi.smooth(frequencies, amplitudes, bandwidth)
+def test_no_zero_frequency():
+    frequencies = np.linspace(1, 10, 10)
+    amplitudes = np.random.rand(10)
+    bandwidth = 40
+    smoothed_spectrum = konnoohmachi.smooth(frequencies, amplitudes, bandwidth)
 
-#     assert smoothed_spectrum.shape == frequencies.shape
+    assert smoothed_spectrum.shape == frequencies.shape
 
 
 @pytest.mark.benchmark
@@ -27,7 +27,7 @@ def test_benchmark():
     from numpy.fft import rfft, rfftfreq
     from obspy.signal.konnoohmachismoothing import konno_ohmachi_smoothing
 
-    """Benchmarks Konnoohmachi rust implementation.
+    """Benchmqarks Konnoohmachi rust implementation.
     We take the obspy implementation as a reference.
     """
 

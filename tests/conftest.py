@@ -13,6 +13,7 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "plot: mark test that generates a plot")
+    config.addinivalue_line("markers", "benchmark: mark test that run a benchmark")
 
 
 def pytest_collection_modifyitems(config, items):
