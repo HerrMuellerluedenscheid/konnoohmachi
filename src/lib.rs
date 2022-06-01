@@ -50,7 +50,7 @@ pub fn konnoohmachi_smooth(
         Zip::from(&mut frequencies_work)
             .and(&frequencies)
             .for_each(|freq_work, &freq| {
-                *freq_work = f64::log10(freq / corner_frequency * bandwidth)
+                *freq_work = f64::log10(freq / corner_frequency) * bandwidth
             });
 
         frequencies_work.map_inplace(|w| *w = f64::powi(f64::sin(*w) / *w, 4));
