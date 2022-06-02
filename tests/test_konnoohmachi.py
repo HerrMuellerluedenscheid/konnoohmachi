@@ -76,12 +76,20 @@ def test_against_obspy():
 
     spec, freqs = rfft(tr.data), rfftfreq(tr.stats.npts, tr.stats.delta)
 
-    plt.figure(figsize=(12, 6))
-    plt.loglog(freqs, np.abs(spec), label="raw", color="lightgrey")
-    plt.loglog(
+    plt.figure(figsize=(8, 4))
+    ax = plt.subplot(111)
+    ax.loglog(freqs, np.abs(spec), label="raw", color="lightgrey")
+    ax.loglog(
         freqs,
         konnoohmachi.smooth(freqs, np.abs(spec), 40),
-        label="konno ohmachi (rust)",
+        label="konno-ohmachi (rust)",
     )
-    plt.legend()
+
+    ax.spines.right.set_visible(False)
+    ax.spines.top.set_visible(False)
+    ax.yaxis.set_ticks_position('left')
+    ax.xaxis.set_ticks_position('bottom')
+
+    ax.legend()
+    plt.savefig("tests/konno-ohmachi-demo.png")
     plt.show()
