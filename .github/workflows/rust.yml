@@ -1,4 +1,4 @@
-name: Rust
+name: Rust Test
 
 on:
   push:
@@ -8,12 +8,11 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  CARGO_REGISTRY_TOKEN: ${{secrets.CRATES_IO_TOKEN}}
 
 jobs:
-  build:
-
+  build-and-test:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Build
