@@ -1,27 +1,29 @@
 use ndarray::{self, Array, Array1, ArrayBase, Dim, IxDynImpl, OwnedRepr, ViewRepr, Zip};
-use numpy::{IntoPyArray, PyArray1, PyArrayDyn};
-use pyo3::prelude::{pymodule, PyModule, PyResult, Python};
+use numpy::{IntoPyArray, PyArray1, PyReadonlyArrayDyn};
+use pyo3::prelude::*;
 
 /// Python module that implements konnoohmachi spectral smoothing
 #[pymodule]
-fn konnoohmachi(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
-    /// Python interface: Smooth a spectrum provided as two one-dimensional vectors containing
-    /// `frequencies` and `amplitudes`
-    #[pyfn(m)]
-    fn smooth<'py>(
-        py: Python<'py>,
-        frequencies: &PyArrayDyn<f64>,
-        amplitudes: &PyArrayDyn<f64>,
-        bandwidth: f64,
-    ) -> &'py PyArray1<f64> {
-        let frequencies = unsafe { frequencies.as_array() };
-        let amplitudes = unsafe { amplitudes.as_array() };
-
-        let out = konnoohmachi_smooth(frequencies, amplitudes, bandwidth);
-        out.into_pyarray(py)
-    }
+fn konnoohmachi(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(smooth, m)?)?;
 
     Ok(())
+}
+
+/// Python interface: Smooth a spectrum provided as two one-dimensional vectors containing
+/// `frequencies` and `amplitudes`
+#[pyfunction]
+fn smooth<'py>(
+    py: Python<'py>,
+    frequencies: PyReadonlyArrayDyn<'py, f64>,
+    amplitudes: PyReadonlyArrayDyn<'py, f64>,
+    bandwidth: f64,
+) -> Bound<'py, PyArray1<f64>> {
+    let frequencies = frequencies.as_array();
+    let amplitudes = amplitudes.as_array();
+
+    let out = konnoohmachi_smooth(frequencies, amplitudes, bandwidth);
+    out.into_pyarray(py)
 }
 
 /// Smooth a spectrum provided as two one-dimensional vectors containing
@@ -40,7 +42,10 @@ pub fn konnoohmachi_smooth(
     assert!(bandwidth > 0.0, "bandwidth has to be greater than 0.");
 
     let mut out = Array1::<f64>::ones(frequencies.len());
-    let zero_frequency_index = frequencies.iter().position(|&v| v == 0.0).unwrap_or(usize::MAX);
+    let zero_frequency_index = frequencies
+        .iter()
+        .position(|&v| v == 0.0)
+        .unwrap_or(usize::MAX);
 
     let mut frequencies_work: ArrayBase<OwnedRepr<f64>, _> = Array::zeros(frequencies.raw_dim());
     frequencies_work.assign(&frequencies);
@@ -55,7 +60,7 @@ pub fn konnoohmachi_smooth(
         frequencies_work.map_inplace(|w| *w = f64::powi(f64::sin(*w) / *w, 4));
         frequencies_work[index_frequency] = 1.;
 
-        if zero_frequency_index != usize::MAX{
+        if zero_frequency_index != usize::MAX {
             frequencies_work[zero_frequency_index] = 0.;
         }
 
